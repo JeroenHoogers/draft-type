@@ -7,15 +7,14 @@ namespace DraftType
         int16_t x, y;
     };
 
-    struct Segment
+    struct Path
     {
-        uint16_t i0;
-        uint16_t i1;
+        uint16_t offset;	// offset into the vertex array (points to first path vertex)
+        uint16_t size;		// number of vertices in the path
     };
 
     struct ShapedGlyph {
         uint16_t glyphIndex;
-        // uint16_t width;
 
         float xOffset;
         float yOffset;

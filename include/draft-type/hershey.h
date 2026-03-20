@@ -2,8 +2,6 @@
 #include <string>
 #include <vector>
 #include <array>
-#include <unordered_map>
-#include <fstream>
 #include "glyph.h"
 
 namespace DraftType
@@ -13,10 +11,9 @@ namespace DraftType
     {
     public:
         struct Glyph {
-            int16_t leftBearing;
-            int16_t rightBearing;
+            uint16_t advance;
             std::vector<Vert> points;
-            std::vector<Segment> indices;
+            std::vector<Path> paths;
         };
 
         void load(const std::string& input_path);

@@ -1,5 +1,6 @@
 #include <draft-type.h>
 #include <string>
+#include <fstream>
 
 const int width = 500;
 const int height = 350;
@@ -36,17 +37,19 @@ void drawGlyph(std::vector<Color>& img, const DraftType::HersheyFont& font, cons
 {
     const auto& geo = font.chr(glyph.glyphIndex);
 
-    for (const auto& s : geo.indices)
+    for (const auto& path : geo.paths)
     {
-        const auto v0 = geo.points[s.i0];
-        const auto v1 = geo.points[s.i1];
+        for (int i = path.offset; i < path.offset + path.size - 1; i++) {
+        const auto v0 = geo.points[i];
+            const auto v1 = geo.points[i+1];
 
-        int x0 = v0.x + glyph.xOffset;
-        int y0 = v0.y + glyph.yOffset;
-        int x1 = v1.x + glyph.xOffset;
-        int y1 = v1.y + glyph.yOffset;
+            int x0 = v0.x + glyph.xOffset;
+            int y0 = v0.y + glyph.yOffset;
+            int x1 = v1.x + glyph.xOffset;
+            int y1 = v1.y + glyph.yOffset;
 
-        drawLine(img, x0, y0, x1, y1, {255, 255, 255});
+            drawLine(img, x0, y0, x1, y1, {255, 255, 255});
+        }
     }
 }
 
