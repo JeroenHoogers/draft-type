@@ -3,8 +3,22 @@
 
 namespace DraftType
 {
-	enum class HorizontalAlign { Left, Center, Right };
-	enum class VerticalAlign { Top, Middle, Bottom };
+	enum class HorizontalAlign {
+		Left,
+		Center,
+		Right
+	};
+
+	enum class VerticalAlign {
+		Top,
+		Middle,
+		Bottom
+	};
+
+	enum class LineSpacingMode {
+		Fixed,		// height of tallest character in the font
+		Dynamic		// height of tallest character in the line
+	};
 
 	struct Bounds
 	{
@@ -23,37 +37,20 @@ namespace DraftType
 		std::vector<ShapedGlyph> layout(const std::string &text,
 										float xoffset = 0.0f,
 										float yoffset = 0.0f) const;
+
+		void calculateLineDims(const std::string &text, int index, float &width,
+							   float &height) const;
+		Bounds getBounds(const std::string &text) const;
+
 		float letterSpacing = 0.0f;
 		float lineSpacing = 5.0f;
 		float scale = 1.0f;
 		float angle = 0.0f;
+
+		LineSpacingMode lineSpaceMode = LineSpacingMode::Fixed;
+
 		HorizontalAlign hAlign = HorizontalAlign::Left;
 		VerticalAlign vAlign = VerticalAlign::Bottom;
-
-		inline Bounds getBounds(const std::string &text) const {
-			float maxX = 0;
-			float cursorX = 0;
-			float cursorY = m_font.height() * 2;
-
-			for (char c : text) {
-				if (c == '\n') {
-					cursorX = 0;
-					cursorY += m_font.height();
-					continue;
-				}
-
-				const auto &glyph = m_font.chr(c);
-				cursorX += glyph.advance + letterSpacing;
-				maxX = std::max(maxX, cursorX);
-			}
-
-			return Bounds{
-				0,		 // top
-				cursorY, // bottom
-				0,		 // left
-				maxX	 // right
-			};
-		}
 
 	private:
 		inline float calculateTextWidth(const std::string &text) const {

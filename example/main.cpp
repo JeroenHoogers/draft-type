@@ -60,7 +60,9 @@ void drawGlyph(std::vector<Color> &img, const DraftType::HersheyFont &font,
 	}
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
+	using namespace DraftType;
 
 	std::string fontName = "futural";
 	if (argc == 2) {
@@ -69,7 +71,7 @@ int main(int argc, char *argv[]) {
 
 	printf("Loading font \"%s\"...\n", fontName.c_str());
 
-	DraftType::HersheyFont font;
+	HersheyFont font;
 
 	font.load("../assets/hershey-fonts/" + fontName + ".jhf");
 
@@ -83,16 +85,28 @@ int main(int argc, char *argv[]) {
 					   "lmnopqrstuv\n"
 					   "wxyz{|}~\x7F";
 
-	DraftType::Shaper shaper(font);
+	Shaper shaper(font);
 	shaper.letterSpacing = 5.0f;
+	shaper.lineSpacing = 5.0f;
+	// shaper.lineSpaceMode = LineSpacingMode::Dynamic;
+	shaper.hAlign = HorizontalAlign::Center;
 
 	auto bounds = shaper.getBounds(text);
 
-	float xPos = 10.0f;
-	float yPos = 20.0f;
+	width = (bounds.right - bounds.left);
+	height = (bounds.bottom - bounds.top);
 
-	width = (bounds.right - bounds.left) + xPos;
-	height = (bounds.bottom - bounds.top) + yPos;
+	float xPos = 10.0f;
+	float yPos = 10.0f;
+	if (shaper.hAlign == HorizontalAlign::Center) {
+		xPos += width * 0.5;
+	} else if (shaper.hAlign == HorizontalAlign::Right) {
+		xPos += width;
+	}
+
+	constexpr int MARGIN = 20;
+	width += MARGIN;
+	height += MARGIN;
 
 	std::vector<Color> img(width * height, {0, 0, 0});
 
@@ -105,8 +119,8 @@ int main(int argc, char *argv[]) {
 
 		float baseY = glyph.yOffset + font.baseoffset();
 		// draw baseline
-		drawLine(img, glyph.xOffset, baseY,
-				 glyph.xOffset + glyph.advance, baseY, {128, 128, 128});
+		drawLine(img, glyph.xOffset, baseY, glyph.xOffset + glyph.advance, baseY, {128, 128, 128});
+
 		// draw height
 		drawLine(img, cx, ty, cx, by, {128, 128, 128});
 
