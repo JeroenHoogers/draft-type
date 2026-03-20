@@ -1,9 +1,9 @@
-#include <hershey.h>
-#include <shaper.h>
+#include <draft-type.h>
 #include <string>
 
 const int width = 500;
 const int height = 350;
+
 
 struct Color {
     unsigned char r, g, b;
@@ -32,14 +32,14 @@ void drawLine(std::vector<Color>& img, int x0, int y0, int x1, int y1, Color c) 
     }
 }
 
-void drawGlyph(std::vector<Color>& img, const HersheyFont& font, const ShapedGlyph& glyph)
+void drawGlyph(std::vector<Color>& img, const DraftType::HersheyFont& font, const DraftType::ShapedGlyph& glyph)
 {
     const auto& geo = font.chr(glyph.glyphIndex);
 
-    for (const Segment& s : geo.indices)
+    for (const auto& s : geo.indices)
     {
-        const Vert v0 = geo.points[s.i0];
-        const Vert v1 = geo.points[s.i1];
+        const auto v0 = geo.points[s.i0];
+        const auto v1 = geo.points[s.i1];
 
         int x0 = v0.x + glyph.xOffset;
         int y0 = v0.y + glyph.yOffset;
@@ -50,20 +50,10 @@ void drawGlyph(std::vector<Color>& img, const HersheyFont& font, const ShapedGly
     }
 }
 
-void drawText(std::vector<Color>& img, const HersheyFont& font, const std::string& text){
-    SimpleShaper shaper(font);
-    shaper.letterSpacing = 5.0f;
-
-    for (const auto& glyph : shaper.layout(text, 10.0f, 20.0f))
-    {
-        drawGlyph(img, font, glyph);
-    }
-}
-
 int main()
 {
-    HersheyFont font;
-    std::string fontName = "meteorology";
+    DraftType::HersheyFont font;
+    std::string fontName = "futural";
 
     font.load("../assets/hershey-fonts/" + fontName +".jhf");
 
@@ -76,11 +66,16 @@ int main()
         "WXYZ[\\]^_`\n"
         "abcdefghijk\n"
         "lmnopqrstuv\n"
-        "wxyz{|}~^?\x7F";
+        "wxyz{|}~\x7F";
 
     std::vector<Color> img(width * height, {0, 0, 0});
+    DraftType::Shaper shaper(font);
+    shaper.letterSpacing = 5.0f;
 
-    drawText(img, font, text);
+    for (const auto& glyph : shaper.layout(text, 10.0f, 20.0f))
+    {
+        drawGlyph(img, font, glyph);
+    }
 
     // write ppm
     std::ofstream out(fontName + ".ppm");

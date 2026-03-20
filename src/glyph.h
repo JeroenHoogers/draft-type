@@ -1,21 +1,24 @@
 #pragma once
 #include <cstdint>
 
-struct Vert {
-    int16_t x, y;
-};
-
-struct Segment
+namespace DraftType
 {
-    uint16_t i0;
-    uint16_t i1;
-};
+    struct Vert {
+        int16_t x, y;
+    };
 
-struct ShapedGlyph {
-    uint16_t glyphIndex;
-    // uint16_t width;
+    struct Segment
+    {
+        uint16_t i0;
+        uint16_t i1;
+    };
 
-    float xOffset;
-    float yOffset;
-    float advance;
-};
+    struct ShapedGlyph {
+        uint16_t glyphIndex;
+        // uint16_t width;
+
+        float xOffset;
+        float yOffset;
+        float advance;
+    };
+}

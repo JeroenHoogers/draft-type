@@ -25,6 +25,7 @@ if ( MSVC )
 endif ( MSVC )
 
 set(SOURCE_DIR src)
+set(INCLUDE_DIR include)
 set(EXAMPLE_DIR example)
 set(ASSETS_DIR assets)
 
@@ -35,13 +36,18 @@ set(SRC_LIB
 	${SOURCE_DIR}/shaper.h
 )
 
+set(SRC_INCLUDE
+  ${INCLUDE_DIR}/draft-type.h
+)
+
 set(SRC_EXAMPLE
 	${EXAMPLE_DIR}/main.cpp
 )
 
-add_library(draft_type STATIC ${SRC_LIB})
+include_directories(${SOURCE_DIR})
+add_library(draft_type STATIC ${SRC_INCLUDE} ${SRC_LIB})
 
 # Test executable
-include_directories(${SOURCE_DIR})
+include_directories(${INCLUDE_DIR})
 add_executable(draft_type_example ${SRC_EXAMPLE})
 target_link_libraries(draft_type_example PRIVATE draft_type)
