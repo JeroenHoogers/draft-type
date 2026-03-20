@@ -9,6 +9,7 @@ namespace DraftType
         float cursor = xoffset;
         int line = 0;
 
+        yoffset += m_font.baseoffset();
         for (char c : text)
         {
             if (c == '\n') {
@@ -19,10 +20,10 @@ namespace DraftType
 
             const auto& glyph = m_font.chr(c);
             ShapedGlyph shapedGlyph {
-                static_cast<uint16_t>(c),					// glyph index
-                cursor,			                       		// x offset
-                yoffset + line * (lineSpacing + 32.0f),		// y offset  --- TODO: get height from font
-                static_cast<float>(glyph.advance)  			// advance
+                static_cast<uint16_t>(c),							// glyph index
+                cursor,			                       				// x offset
+                yoffset + line * (lineSpacing + m_font.height()),	// y offset
+                static_cast<float>(glyph.advance)  					// advance
             };
             cursor += shapedGlyph.advance + letterSpacing;
             result.push_back(std::move(shapedGlyph));

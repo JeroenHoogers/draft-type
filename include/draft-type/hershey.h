@@ -1,34 +1,39 @@
 #pragma once
+#include "glyph.h"
+#include <array>
 #include <string>
 #include <vector>
-#include <array>
-#include "glyph.h"
 
 namespace DraftType
 {
-    // Hershey font specification: https://paulbourke.net/dataformats/hershey/
-    class HersheyFont
-    {
-    public:
-        struct Glyph {
-            uint16_t advance;
-            std::vector<Vert> points;
-            std::vector<Path> paths;
-        };
+	// Hershey font specification: https://paulbourke.net/dataformats/hershey/
+	class HersheyFont
+	{
+	public:
+		constexpr static const uint16_t BASELINE_OFFSET = 10;
 
-        void load(const std::string& input_path);
-        const std::array<Glyph, 256>& data() const { return m_glyphs; };
-        const Glyph chr(char c) const { return m_glyphs[(uint16_t)c]; };
-        uint16_t size() const { return m_size; };
+		struct Glyph
+		{
+			uint16_t advance;
+			uint16_t height;
+			int16_t ymin;
+			std::vector<Vert> points;
+			std::vector<Path> paths;
+		};
 
-    private:
-        inline int16_t coord(char c) const {
-            return c - 'R';
-        }
+		void load(const std::string &input_path);
+		const std::array<Glyph, 256> &data() const { return m_glyphs; };
+		const Glyph chr(char c) const { return m_glyphs[(uint16_t)c]; };
+		uint32_t height() const { return m_maxCharHeight; };
+		uint16_t baseoffset() const { return BASELINE_OFFSET; };
 
-        Glyph parse(const std::string& line) const;
+	private:
+		inline int16_t coord(char c) const { return c - 'R'; }
 
-        std::array<Glyph, 256> m_glyphs;
-        uint16_t m_size;
-    };
-}
+		Glyph parse(const std::string &line) const;
+
+		std::array<Glyph, 256> m_glyphs;
+		uint16_t m_size;
+		uint16_t m_maxCharHeight;
+	};
+} // namespace DraftType
