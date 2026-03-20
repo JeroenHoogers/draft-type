@@ -52,8 +52,9 @@ void drawGlyph(std::vector<Color>& img, const HersheyFont& font, const ShapedGly
 
 void drawText(std::vector<Color>& img, const HersheyFont& font, const std::string& text){
     SimpleShaper shaper(font);
+    shaper.letterSpacing = 5.0f;
 
-    for (const auto& glyph : shaper.layout(text))
+    for (const auto& glyph : shaper.layout(text, 10.0f, 20.0f))
     {
         drawGlyph(img, font, glyph);
     }
