@@ -41,6 +41,7 @@ namespace DraftType
 		void calculateLineDims(const std::string &text, int index, float &width,
 							   float &height) const;
 		Bounds getBounds(const std::string &text) const;
+		const HersheyFont& font() const { return m_font; };
 
 		float letterSpacing = 0.0f;
 		float lineSpacing = 5.0f;
