@@ -1,6 +1,14 @@
 # Draft Type
 A minimal Hershey vector font library.
 
+## Features:
+- Loads Hershey font files (.jhf)
+- Shaper 
+	- Multiline support
+	- Scaling
+	- Horizontal alignment
+	- Vertical alignment
+
 ## Usage:
 To include the library in your own project, add the following lines to your CMakeList.txt:
 (The library is located in `deps/draft-type`, adapt as needed)
@@ -18,6 +26,19 @@ target_link_libraries(<your_target> PRIVATE draft_type)
 #### Include the library in own project
 ```
 #include <draft-type.h>
+```
+Usage:
+```
+	HersheyFont font("../assets/hershey-fonts/rowmans.jhf");
+
+	LayoutOptions opts = {};
+	opts.horizontalAlign = HorizontalAlign::Center;
+	opts.letterSpacing = 5.0f;
+
+	for (const auto &glyph : DraftType::Shaper::layout(font, "Hello World!", x, y, opts)) {
+		// draw glyph
+	}
+
 ```
 
 ## Build and run example:
@@ -52,7 +73,8 @@ The example will generate a .ppm image dispaying all characters of the specified
 ![image](assets/images/astrology.png)
 *astrology.ppm*
 
-
+![image](assets/images/gothgrt.png)
+*gothgrt.ppm*
 
 ### Font License:
 Applies to the fonts in: `assets/hershey-fonts/`

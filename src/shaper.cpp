@@ -2,15 +2,15 @@
 
 namespace DraftType
 {
-	void Shaper::calculateLineDims(const std::string &text, int index, float &width, float &height) const {
+	void Shaper::calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts) {
 		uint16_t lineHeight = 0;
 		uint32_t lineWidth = 0;
 
 		// calculate line width and height for current line
 		for (size_t j = index; j < text.size(); j++) {
 			const char c = text[j];
-			const auto &glyph = m_font.chr(c);
-			lineWidth += glyph.advance + letterSpacing;
+			const auto &glyph = font.chr(c);
+			lineWidth += glyph.advance * opts.scale + opts.letterSpacing;
 			lineHeight = std::max(lineHeight, glyph.height);
 
 			if (c == '\n') {
@@ -18,11 +18,11 @@ namespace DraftType
 			}
 		}
 
-		width = lineWidth * scale;
-		height = lineHeight * scale;
+		width = lineWidth;
+		height = lineHeight * opts.scale;
 	}
 
-	Bounds Shaper::getBounds(const std::string &text) const {
+	Bounds Shaper::measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts) {
 		float maxWidth = 0;
 		float cursorY = 0;
 		bool newLine = true;
@@ -31,14 +31,14 @@ namespace DraftType
 			if (newLine) {
 				float lineWidth;
 				float lineHeight;
-				calculateLineDims(text, i, lineWidth, lineHeight);
+				calculateLineDims(font, text, i, lineWidth, lineHeight, opts);
 				maxWidth = std::max(maxWidth, lineWidth);
 
-				if (lineSpaceMode == LineSpacingMode::Fixed) {
-					lineHeight = m_font.height();
+				if (opts.lineSpaceMode == LineSpacingMode::Fixed) {
+					lineHeight = font.height() * opts.scale;
 				}
 
-				cursorY += lineHeight * scale + lineSpacing;
+				cursorY += lineHeight + opts.lineSpacing;
 				newLine = false;
 			}
 			if (c == '\n') {
@@ -52,11 +52,11 @@ namespace DraftType
 		};
 	}
 
-	std::vector<ShapedGlyph> Shaper::layout(const std::string &text, float xoffset, float yoffset) const {
+	std::vector<ShapedGlyph> Shaper::layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts) {
 		std::vector<ShapedGlyph> result;
 		result.reserve(text.size());
 		float cursorX = 0;
-		float cursorY = yoffset;
+		float cursorY = y;
 
 		float lineWidth = 0;
 		float lineHeight = 0;
@@ -68,22 +68,22 @@ namespace DraftType
 			const char c = text[i];
 			if (newLine) {
 				// add height below baseline from last line
-				cursorY += (lineHeight - baseLine) * scale;
+				cursorY += (lineHeight - baseLine) * opts.scale;
 
-				calculateLineDims(text, i, lineWidth, lineHeight);
+				calculateLineDims(font, text, i, lineWidth, lineHeight, opts);
 
-				cursorX = xoffset;
-				if (hAlign == HorizontalAlign::Center) {
-					cursorX = xoffset - (lineWidth / 2.0f) * scale;
-				} else if (hAlign == HorizontalAlign::Right) {
-					cursorX = xoffset - lineWidth * scale;
+				cursorX = x;
+				if (opts.horizontalAlign == HorizontalAlign::Center) {
+					cursorX = x - (lineWidth / 2.0f);
+				} else if (opts.horizontalAlign == HorizontalAlign::Right) {
+					cursorX = x - lineWidth;
 				}
 
-				if (lineSpaceMode == LineSpacingMode::Fixed) {
-					lineHeight = m_font.height();
+				if (opts.lineSpaceMode == LineSpacingMode::Fixed) {
+					lineHeight = font.height();
 				}
 				baseLine = lineHeight * 0.5f; // + m_font.baseoffset();
-				cursorY += baseLine * scale + lineSpacing;
+				cursorY += baseLine * opts.scale + opts.lineSpacing;
 
 				newLine = false;
 			}
@@ -94,17 +94,17 @@ namespace DraftType
 			}
 
 			// add shaped glyph to output
-			const auto &glyph = m_font.chr(c);
-			ShapedGlyph shapedGlyph{
-				static_cast<uint16_t>(c),		  // glyph index
-				cursorX,						  // x offset
-				cursorY,						  // y offset
-				static_cast<float>(glyph.advance) // advance
+			const auto &glyph = font.chr(c);
+			ShapedGlyph shapedGlyph {
+				static_cast<uint16_t>(c), // glyph index
+				cursorX,				  // x offset
+				cursorY,				  // y offset
+				opts.scale				  // scale
 			};
-			cursorX += shapedGlyph.advance + letterSpacing;
 			result.push_back(std::move(shapedGlyph));
-		}
 
+			cursorX += opts.scale * glyph.advance + opts.letterSpacing;
+		}
 		return result;
 	}
 } // namespace DraftType

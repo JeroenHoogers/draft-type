@@ -50,10 +50,10 @@ void drawGlyph(std::vector<Color> &img, const DraftType::HersheyFont &font,
 			const auto v0 = geo.points[i];
 			const auto v1 = geo.points[i + 1];
 
-			int x0 = v0.x + glyph.xOffset;
-			int y0 = v0.y + glyph.yOffset;
-			int x1 = v1.x + glyph.xOffset;
-			int y1 = v1.y + glyph.yOffset;
+			int x0 = v0.x * glyph.scale + glyph.x;
+			int y0 = v0.y * glyph.scale + glyph.y;
+			int x1 = v1.x * glyph.scale + glyph.x;
+			int y1 = v1.y * glyph.scale + glyph.y;
 
 			drawLine(img, x0, y0, x1, y1, {255, 255, 255});
 		}
@@ -71,9 +71,7 @@ int main(int argc, char *argv[])
 
 	printf("Loading font \"%s\"...\n", fontName.c_str());
 
-	HersheyFont font;
-
-	font.load("../assets/hershey-fonts/" + fontName + ".jhf");
+	HersheyFont font("../assets/hershey-fonts/" + fontName + ".jhf");
 
 	std::string text = " !\"#$%&'()*\n"
 					   "+,-./012345\n"
@@ -85,22 +83,20 @@ int main(int argc, char *argv[])
 					   "lmnopqrstuv\n"
 					   "wxyz{|}~\x7F";
 
-	Shaper shaper(font);
-	shaper.letterSpacing = 5.0f;
-	shaper.lineSpacing = 5.0f;
-	// shaper.lineSpaceMode = LineSpacingMode::Dynamic;
-	shaper.hAlign = HorizontalAlign::Center;
+	LayoutOptions opts = {};
+	opts.horizontalAlign = HorizontalAlign::Center;
+	opts.letterSpacing = 5.0f;
 
-	auto bounds = shaper.getBounds(text);
+	auto bounds = DraftType::Shaper::measure(font, text, opts);
 
 	width = (bounds.right - bounds.left);
 	height = (bounds.bottom - bounds.top);
 
 	float xPos = 10.0f;
 	float yPos = 10.0f;
-	if (shaper.hAlign == HorizontalAlign::Center) {
+	if (opts.horizontalAlign == HorizontalAlign::Center) {
 		xPos += width * 0.5;
-	} else if (shaper.hAlign == HorizontalAlign::Right) {
+	} else if (opts.horizontalAlign == HorizontalAlign::Right) {
 		xPos += width;
 	}
 
@@ -110,19 +106,19 @@ int main(int argc, char *argv[])
 
 	std::vector<Color> img(width * height, {0, 0, 0});
 
-	for (const auto &glyph : shaper.layout(text, xPos, yPos)) {
+	for (const auto &glyph : DraftType::Shaper::layout(font, text, xPos, yPos, opts)) {
 		const auto &geo = font.chr(glyph.glyphIndex);
 
-		float cx = glyph.xOffset + glyph.advance * 0.5;
-		float ty = glyph.yOffset + geo.ymin;
-		float by = glyph.yOffset + geo.ymin + geo.height;
+		// float cx = glyph.x + glyph.scale * geo.advance * 0.5;
+		// float ty = glyph.y + glyph.scale * geo.ymin;
+		// float by = glyph.y + glyph.scale * geo.ymin + glyph.scale * geo.height;
 
-		float baseY = glyph.yOffset + font.baseoffset();
+		float baseY = glyph.y + glyph.scale * font.baseoffset();
 		// draw baseline
-		drawLine(img, glyph.xOffset, baseY, glyph.xOffset + glyph.advance, baseY, {128, 128, 128});
+		drawLine(img, glyph.x, baseY, glyph.x + geo.advance * glyph.scale, baseY, {128, 128, 128});
 
 		// draw height
-		drawLine(img, cx, ty, cx, by, {128, 128, 128});
+		// drawLine(img, cx, ty, cx, by, {128, 128, 128});
 
 		drawGlyph(img, font, glyph);
 	}

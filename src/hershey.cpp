@@ -1,11 +1,12 @@
 #include <cstdint>
 #include <draft-type/hershey.h>
 #include <fstream>
+#include <stdexcept>
 
 namespace DraftType
 {
-	void HersheyFont::load(const std::string &input_path) {
-		std::ifstream file(input_path);
+	void HersheyFont::load(const std::string &path) {
+		std::ifstream file(path);
 
 		std::string line;
 		m_maxCharHeight = 0;
@@ -21,7 +22,7 @@ namespace DraftType
 			}
 			file.close();
 		} else {
-			printf("Unable to open file!\n");
+			throw std::runtime_error("Font file not found: \"" + path + "\"");
 		}
 	}
 
@@ -36,9 +37,7 @@ namespace DraftType
 #endif
 
 		if (left > right) {
-			// TODO: throw error
-			printf("Invalid left position %d > right pos %d!", left, right);
-			return {};
+			throw std::runtime_error("Invalid left position " + std::to_string(left) + " > right pos " + std::to_string(right) + "!");
 		}
 
 		std::vector<Vert> verts;

@@ -16,8 +16,8 @@ namespace DraftType
 	};
 
 	enum class LineSpacingMode {
-		Fixed,		// height of tallest character in the font
-		Dynamic		// height of tallest character in the line
+		Fixed,	// height of tallest character in the font
+		Dynamic // height of tallest character in the line
 	};
 
 	struct Bounds
@@ -28,40 +28,33 @@ namespace DraftType
 		float right;
 	};
 
-	class Shaper
+	struct LayoutOptions
 	{
-	public:
-		Shaper(HersheyFont font) : m_font(font) {}
-		Shaper(HersheyFont &&font) : m_font(std::move(font)) {}
-
-		std::vector<ShapedGlyph> layout(const std::string &text,
-										float xoffset = 0.0f,
-										float yoffset = 0.0f) const;
-
-		void calculateLineDims(const std::string &text, int index, float &width,
-							   float &height) const;
-		Bounds getBounds(const std::string &text) const;
-		const HersheyFont& font() const { return m_font; };
-
 		float letterSpacing = 0.0f;
 		float lineSpacing = 5.0f;
 		float scale = 1.0f;
-		float angle = 0.0f;
+		float angle = 0.0f; // Not (yet) supported
 
 		LineSpacingMode lineSpaceMode = LineSpacingMode::Fixed;
 
-		HorizontalAlign hAlign = HorizontalAlign::Left;
-		VerticalAlign vAlign = VerticalAlign::Bottom;
+		HorizontalAlign horizontalAlign = HorizontalAlign::Left;
+		VerticalAlign verticalAlign = VerticalAlign::Bottom;
+	};
+
+	class Shaper
+	{
+
+	public:
+		Shaper() = delete;
+
+		static std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
+											   float xoffset = 0.0f,
+											   float yoffset = 0.0f,
+											   const LayoutOptions &opts = {});
+
+		static Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts = {});
 
 	private:
-		inline float calculateTextWidth(const std::string &text) const {
-			float width = 0.0f;
-			for (char c : text) {
-				width += (m_font.chr(c).advance + letterSpacing) * scale;
-			}
-			return width;
-		}
-
-		HersheyFont m_font;
+		static void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts);
 	};
 } // namespace DraftType
