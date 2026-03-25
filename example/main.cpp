@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	opts.horizontalAlign = HorizontalAlign::Center;
 	opts.letterSpacing = 5.0f;
 
-	auto bounds = DraftType::Shaper::measure(font, text, opts);
+	auto bounds = DraftType::measure(font, text, opts);
 
 	width = (bounds.right - bounds.left);
 	height = (bounds.bottom - bounds.top);
@@ -106,19 +106,20 @@ int main(int argc, char *argv[])
 
 	std::vector<Color> img(width * height, {0, 0, 0});
 
-	for (const auto &glyph : DraftType::Shaper::layout(font, text, xPos, yPos, opts)) {
+	for (const auto &glyph : DraftType::layout(font, text, xPos, yPos, opts)) {
 		const auto &geo = font.chr(glyph.glyphIndex);
 
-		// float cx = glyph.x + glyph.scale * geo.advance * 0.5;
-		// float ty = glyph.y + glyph.scale * geo.ymin;
-		// float by = glyph.y + glyph.scale * geo.ymin + glyph.scale * geo.height;
+		float cx = glyph.x + glyph.scale * geo.advance * 0.5;
+		float ty = glyph.y + glyph.scale * geo.ymin;
+		float by = glyph.y + glyph.scale * geo.ymin + glyph.scale * geo.height;
 
 		float baseY = glyph.y + glyph.scale * font.baseoffset();
+
 		// draw baseline
 		drawLine(img, glyph.x, baseY, glyph.x + geo.advance * glyph.scale, baseY, {128, 128, 128});
 
 		// draw height
-		// drawLine(img, cx, ty, cx, by, {128, 128, 128});
+		drawLine(img, cx, ty, cx, by, {128, 128, 128});
 
 		drawGlyph(img, font, glyph);
 	}

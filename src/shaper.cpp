@@ -2,7 +2,7 @@
 
 namespace DraftType
 {
-	void Shaper::calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts) {
+	void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts) {
 		uint16_t lineHeight = 0;
 		uint32_t lineWidth = 0;
 
@@ -22,7 +22,7 @@ namespace DraftType
 		height = lineHeight * opts.scale;
 	}
 
-	Bounds Shaper::measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts) {
+	Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts) {
 		float maxWidth = 0;
 		float cursorY = 0;
 		bool newLine = true;
@@ -52,7 +52,7 @@ namespace DraftType
 		};
 	}
 
-	std::vector<ShapedGlyph> Shaper::layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts) {
+	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts) {
 		std::vector<ShapedGlyph> result;
 		result.reserve(text.size());
 		float cursorX = 0;

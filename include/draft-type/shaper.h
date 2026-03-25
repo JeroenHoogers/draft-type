@@ -41,20 +41,12 @@ namespace DraftType
 		VerticalAlign verticalAlign = VerticalAlign::Bottom;
 	};
 
-	class Shaper
-	{
+	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
+									float xoffset = 0.0f, float yoffset = 0.0f,
+									const LayoutOptions &opts = {});
 
-	public:
-		Shaper() = delete;
+	Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts = {});
 
-		static std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
-											   float xoffset = 0.0f,
-											   float yoffset = 0.0f,
-											   const LayoutOptions &opts = {});
-
-		static Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts = {});
-
-	private:
-		static void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts);
-	};
+	// static void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts);
+	// };
 } // namespace DraftType

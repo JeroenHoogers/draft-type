@@ -35,10 +35,9 @@ Usage:
 	opts.horizontalAlign = HorizontalAlign::Center;
 	opts.letterSpacing = 5.0f;
 
-	for (const auto &glyph : DraftType::Shaper::layout(font, "Hello World!", x, y, opts)) {
+	for (const auto &glyph : DraftType::layout(font, "Hello World!", x, y, opts)) {
 		// draw glyph
 	}
-
 ```
 
 ## Build and run example:
