@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <vector>
 
 namespace DraftType
 {
@@ -10,13 +11,13 @@ namespace DraftType
 
 	struct Path
 	{
-		uint16_t offset; // offset into the vertex array (points to first path vertex)
-		uint16_t size;	 // number of vertices in the path
+		uint32_t offset; // offset into the vertex array (points to first path vertex)
+		uint32_t size;	 // number of vertices in the path
 	};
 
 	struct ShapedGlyph
 	{
-		uint16_t glyphIndex;
+		uint32_t glyphIndex;
 		float x, y;
 		float scale;
 	};

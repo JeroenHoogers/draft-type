@@ -26,6 +26,46 @@ namespace DraftType
 		}
 	}
 
+	// Generates font buffers for GPU rendering
+	GPUFont HersheyFont::generateGPUFont() const {
+		GPUFont gpuBuffers {};
+
+		uint32_t vertexOffset = 0;
+		uint32_t indexOffset = 0;
+		for (const Glyph& glyph : m_glyphs)
+		{
+			// append vertices
+			gpuBuffers.vertices.insert(gpuBuffers.vertices.end(), glyph.points.begin(), glyph.points.end());
+
+			uint32_t glyphIndexOffset = indexOffset;
+
+			// create index buffer for Line List topology
+			for(const Path& path : glyph.paths) {
+				if (path.size <= 0) {
+					continue;
+				}
+				for (int i = 0; i < static_cast<int>(path.size) - 1; i++) {
+					gpuBuffers.indices.push_back(vertexOffset + i + path.offset);
+					gpuBuffers.indices.push_back(vertexOffset + i + path.offset + 1);
+				}
+				indexOffset += (static_cast<int>(path.size) - 1) * 2;
+			}
+
+			// TODO: create index buffer for Line List w\ Adjacency topology
+
+			gpuBuffers.glyphs.push_back(
+				GlyphInfo {
+					glyphIndexOffset,										// indexOffset
+					static_cast<uint32_t>(indexOffset - glyphIndexOffset)	// indexCount
+				}
+			);
+
+			vertexOffset += glyph.points.size();
+		}
+
+		return gpuBuffers;
+	}
+
 	HersheyFont::Glyph HersheyFont::parse(const std::string &line) const {
 		u_int16_t numVerts = std::stoi(line.substr(5, 3));
 		int16_t left = coord(line[8]);

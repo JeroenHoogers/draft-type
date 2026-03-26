@@ -46,7 +46,7 @@ void drawGlyph(std::vector<Color> &img, const DraftType::HersheyFont &font,
 	const auto &geo = font.chr(glyph.glyphIndex);
 
 	for (const auto &path : geo.paths) {
-		for (int i = path.offset; i < path.offset + path.size - 1; i++) {
+		for (int i = path.offset; i < static_cast<int>(path.offset + path.size) - 1; i++) {
 			const auto v0 = geo.points[i];
 			const auto v1 = geo.points[i + 1];
 
