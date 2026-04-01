@@ -96,10 +96,10 @@ namespace DraftType
 			// add shaped glyph to output
 			const auto &glyph = font.chr(c);
 			ShapedGlyph shapedGlyph {
-				static_cast<uint16_t>(c), // glyph index
-				cursorX,				  // x offset
-				cursorY,				  // y offset
-				opts.scale				  // scale
+				cursorX,                   // x offset
+				cursorY,                   // y offset
+				opts.scale,                // scale
+				static_cast<uint32_t>(c)   // glyph index
 			};
 			result.push_back(std::move(shapedGlyph));
 

@@ -17,8 +17,8 @@ namespace DraftType
 
 	struct ShapedGlyph
 	{
-		uint32_t glyphIndex;
 		float x, y;
 		float scale;
+		uint32_t glyphIndex;
 	};
 } // namespace DraftType
