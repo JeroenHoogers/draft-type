@@ -1,7 +1,7 @@
 #pragma once
 #include "hershey.h"
 
-namespace DraftType
+namespace drafttype
 {
 	enum class HorizontalAlign {
 		Left,
@@ -43,10 +43,10 @@ namespace DraftType
 
 	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
 									float xoffset = 0.0f, float yoffset = 0.0f,
-									const LayoutOptions &opts = {});
+									const LayoutOptions &opts = {}, bool sort = false);
 
 	Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts = {});
 
 	// static void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts);
 	// };
-} // namespace DraftType
+} // namespace drafttype

@@ -3,7 +3,7 @@
 #include <fstream>
 #include <stdexcept>
 
-namespace DraftType
+namespace drafttype
 {
 	void HersheyFont::load(const std::string &path) {
 		std::ifstream file(path);
@@ -52,7 +52,6 @@ namespace DraftType
 			}
 
 			// TODO: create index buffer for Line List w\ Adjacency topology
-
 			gpuBuffers.glyphs.push_back(
 				GlyphInfo {
 					glyphIndexOffset,										// indexOffset
@@ -122,4 +121,4 @@ namespace DraftType
 			std::move(paths)					 // paths
 		};
 	}
-} // namespace DraftType
+} // namespace drafttype

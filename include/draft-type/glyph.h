@@ -1,8 +1,7 @@
 #pragma once
 #include <cstdint>
-#include <vector>
 
-namespace DraftType
+namespace drafttype
 {
 	struct Vert
 	{
@@ -21,4 +20,4 @@ namespace DraftType
 		float scale;
 		uint32_t glyphIndex;
 	};
-} // namespace DraftType
+} // namespace drafttype

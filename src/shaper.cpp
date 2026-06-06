@@ -1,6 +1,7 @@
 #include <draft-type/shaper.h>
+#include <algorithm>
 
-namespace DraftType
+namespace drafttype
 {
 	void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts) {
 		uint16_t lineHeight = 0;
@@ -52,7 +53,7 @@ namespace DraftType
 		};
 	}
 
-	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts) {
+	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts, bool sort) {
 		std::vector<ShapedGlyph> result;
 		result.reserve(text.size());
 		float cursorX = 0;
@@ -105,6 +106,12 @@ namespace DraftType
 
 			cursorX += opts.scale * glyph.advance + opts.letterSpacing;
 		}
+
+		// sort glyphs based on glyph idx (useful for instanced GPU rendering)
+		if (sort) {
+			std::sort(begin(result), end(result), [](ShapedGlyph a, ShapedGlyph b) { return a.glyphIndex < b.glyphIndex; });
+		}
+
 		return result;
 	}
-} // namespace DraftType
+} // namespace drafttype

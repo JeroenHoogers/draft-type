@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace DraftType
+namespace drafttype
 {
 	// Used for GPU rendering
 	struct GlyphInfo {
@@ -57,4 +57,4 @@ namespace DraftType
 		uint16_t m_size;
 		uint16_t m_maxCharHeight;
 	};
-} // namespace DraftType
+} // namespace drafttype

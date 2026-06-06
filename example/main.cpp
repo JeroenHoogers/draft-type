@@ -41,8 +41,8 @@ void drawLine(std::vector<Color> &img, int x0, int y0, int x1, int y1,
 	}
 }
 
-void drawGlyph(std::vector<Color> &img, const DraftType::HersheyFont &font,
-			   const DraftType::ShapedGlyph &glyph) {
+void drawGlyph(std::vector<Color> &img, const drafttype::HersheyFont &font,
+			   const drafttype::ShapedGlyph &glyph) {
 	const auto &geo = font.chr(glyph.glyphIndex);
 
 	for (const auto &path : geo.paths) {
@@ -62,7 +62,7 @@ void drawGlyph(std::vector<Color> &img, const DraftType::HersheyFont &font,
 
 int main(int argc, char *argv[])
 {
-	using namespace DraftType;
+	using namespace drafttype;
 
 	std::string fontName = "futural";
 	if (argc == 2) {
@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 	opts.horizontalAlign = HorizontalAlign::Center;
 	opts.letterSpacing = 5.0f;
 
-	auto bounds = DraftType::measure(font, text, opts);
+	auto bounds = measure(font, text, opts);
 
 	width = (bounds.right - bounds.left);
 	height = (bounds.bottom - bounds.top);
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
 	std::vector<Color> img(width * height, {0, 0, 0});
 
-	for (const auto &glyph : DraftType::layout(font, text, xPos, yPos, opts)) {
+	for (const auto &glyph : layout(font, text, xPos, yPos, opts)) {
 		const auto &geo = font.chr(glyph.glyphIndex);
 
 		float cx = glyph.x + glyph.scale * geo.advance * 0.5;
