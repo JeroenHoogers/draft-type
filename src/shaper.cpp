@@ -1,37 +1,59 @@
-#include <draft-type/shaper.h>
 #include <algorithm>
+#include <draft-type/shaper.h>
 
 namespace drafttype
 {
-	void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts) {
-		uint16_t lineHeight = 0;
-		uint32_t lineWidth = 0;
+	namespace
+	{
+		void calculateLineDims(const HersheyFont& font, const std::string& text, int index, float& width, float& height, const LayoutOptions& opts)
+		{
+			width = 0;
+			height = 0;
 
-		// calculate line width and height for current line
-		for (size_t j = index; j < text.size(); j++) {
-			const char c = text[j];
-			const auto &glyph = font.chr(c);
-			lineWidth += glyph.advance * opts.scale + opts.letterSpacing;
-			lineHeight = std::max(lineHeight, glyph.height);
+			// use font height
+			if (opts.lineSpaceMode == LineSpacingMode::Fixed) {
+				height = font.height() * opts.scale;
+			}
 
-			if (c == '\n') {
-				break;
+			bool firstGlyph = true;
+
+			// calculate line width and height for current line
+			for (size_t j = index; j < text.size(); j++) {
+				const char c = text[j];
+
+				if (c == '\n') {
+					break;
+				}
+
+				const auto& glyph = font.chr(c);
+
+				// letter spacing between glyphs, not after the final glyph.
+				if (!firstGlyph) {
+					width += opts.letterSpacing;
+				}
+
+				// find highest glyph
+				if (opts.lineSpaceMode == LineSpacingMode::Dynamic) {
+					height = std::max(height, glyph.height * opts.scale);
+				}
+
+				width += glyph.advance * opts.scale;
+				firstGlyph = false;
 			}
 		}
+	} // namespace
 
-		width = lineWidth;
-		height = lineHeight * opts.scale;
-	}
-
-	Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts) {
+	Bounds measure(const HersheyFont& font, const std::string& text, const LayoutOptions& opts)
+	{
 		float maxWidth = 0;
-		float cursorY = 0;
+		float height = 0;
+		uint32_t lineCount = 0;
+
 		bool newLine = true;
 		for (size_t i = 0; i < text.size(); i++) {
 			const char c = text[i];
 			if (newLine) {
-				float lineWidth;
-				float lineHeight;
+				float lineWidth, lineHeight;
 				calculateLineDims(font, text, i, lineWidth, lineHeight, opts);
 				maxWidth = std::max(maxWidth, lineWidth);
 
@@ -39,7 +61,8 @@ namespace drafttype
 					lineHeight = font.height() * opts.scale;
 				}
 
-				cursorY += lineHeight + opts.lineSpacing;
+				height += lineHeight;
+				lineCount++;
 				newLine = false;
 			}
 			if (c == '\n') {
@@ -47,17 +70,44 @@ namespace drafttype
 			}
 		}
 
-		return Bounds{
-			0, cursorY, // top - bottom
-			0, maxWidth // left - right
-		};
+		if (lineCount > 1) {
+			height += (lineCount - 1) * opts.lineSpacing;
+		}
+
+		float left = 0.0f;
+		float right = maxWidth;
+
+		if (opts.horizontalAlign == HorizontalAlign::Center) {
+			left = -maxWidth / 2.0f;
+			right = maxWidth / 2.0f;
+		} else if (opts.horizontalAlign == HorizontalAlign::Right) {
+			left = -maxWidth;
+			right = 0.0f;
+		}
+
+		float top = 0;
+		float bottom = height;
+
+		if (opts.verticalAlign == VerticalAlign::Middle) {
+			top = -height * 0.5f;
+			bottom = height * 0.5f;
+		} else if (opts.verticalAlign == VerticalAlign::Bottom) {
+			top = -height;
+			bottom = 0.0f;
+		}
+
+		return Bounds{top, bottom, left, right};
 	}
 
-	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text, float x, float y, const LayoutOptions &opts, bool sort) {
+	std::vector<ShapedGlyph> layout(const HersheyFont& font, const std::string& text, const LayoutOptions& opts, bool sort)
+	{
+		return layout(font, text, 0, 0, opts, sort);
+	}
+
+	std::vector<ShapedGlyph> layout(const HersheyFont& font, const std::string& text, float x, float y, const LayoutOptions& opts, bool sort)
+	{
 		std::vector<ShapedGlyph> result;
 		result.reserve(text.size());
-		float cursorX = 0;
-		float cursorY = y;
 
 		float lineWidth = 0;
 		float lineHeight = 0;
@@ -65,28 +115,33 @@ namespace drafttype
 
 		bool newLine = true;
 
+		Bounds bounds = measure(font, text, opts);
+		float cursorX = 0;
+		float cursorY = bounds.top + y;
+
+		bool firstLine = true;
 		for (size_t i = 0; i < text.size(); i++) {
 			const char c = text[i];
 			if (newLine) {
 				// add height below baseline from last line
-				cursorY += (lineHeight - baseLine) * opts.scale;
+				cursorY += (lineHeight - baseLine);
 
 				calculateLineDims(font, text, i, lineWidth, lineHeight, opts);
 
-				cursorX = x;
+				cursorX = x; // left
 				if (opts.horizontalAlign == HorizontalAlign::Center) {
 					cursorX = x - (lineWidth / 2.0f);
 				} else if (opts.horizontalAlign == HorizontalAlign::Right) {
 					cursorX = x - lineWidth;
 				}
 
-				if (opts.lineSpaceMode == LineSpacingMode::Fixed) {
-					lineHeight = font.height();
-				}
 				baseLine = lineHeight * 0.5f; // + m_font.baseoffset();
-				cursorY += baseLine * opts.scale + opts.lineSpacing;
-
+				cursorY += baseLine;
+				if (!firstLine) {
+					cursorY += opts.lineSpacing;
+				}
 				newLine = false;
+				firstLine = false;
 			}
 
 			if (c == '\n') {
@@ -95,12 +150,12 @@ namespace drafttype
 			}
 
 			// add shaped glyph to output
-			const auto &glyph = font.chr(c);
-			ShapedGlyph shapedGlyph {
-				cursorX,                   // x offset
-				cursorY,                   // y offset
-				opts.scale,                // scale
-				static_cast<uint32_t>(c)   // glyph index
+			const auto& glyph = font.chr(c);
+			ShapedGlyph shapedGlyph{
+				cursorX,				 // x offset
+				cursorY,				 // y offset
+				opts.scale,				 // scale
+				static_cast<uint32_t>(c) // glyph index
 			};
 			result.push_back(std::move(shapedGlyph));
 

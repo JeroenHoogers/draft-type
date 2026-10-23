@@ -1,61 +1,79 @@
 # Draft Type
-A minimal Hershey vector font library.
+
+A minimal C++ Hershey vector font library with text layout and shaping.
 
 ## Features:
+
 - Loads Hershey font files (.jhf)
-- Shaper 
-	- Multiline support
-	- Scaling
-	- Horizontal alignment
-	- Vertical alignment
+- GPU friendly vertex / index / instance buffers (See: [Vulkan Example](https://github.com/JeroenHoogers/vk-gfx#text))
+- Shaper:
+  - Line and Glyph Spacing
+  - Multiline
+  - Scaling
+  - Dynamic Line Height
+  - Horizontal alignment
+  - Vertical alignment
 
 ## Usage:
+
 To include the library in your own project, add the following lines to your CMakeList.txt:
 (The library is located in `deps/draft-type`, adapt as needed)
-```
+
+```cmake
 set(DRAFT_TYPE_DIR deps/draft-type)
 add_subdirectory(${DRAFT_TYPE_DIR})
 include_directories(${DRAFT_TYPE_DIR}/include)
 
-...
+# ...
 
 target_link_libraries(<your_target> PRIVATE draft_type)
 
 ```
 
 #### Include the library in own project
-```
+
+```cpp
 #include <draft-type.h>
 ```
+
 Usage:
-```
-	HersheyFont font("../assets/hershey-fonts/rowmans.jhf");
 
-	LayoutOptions opts = {};
-	opts.horizontalAlign = HorizontalAlign::Center;
-	opts.letterSpacing = 5.0f;
+```cpp
+	drafttype::HersheyFont font("../assets/hershey-fonts/rowmans.jhf");
 
-	for (const auto &glyph : DraftType::layout(font, "Hello World!", x, y, opts)) {
+	drafttype::LayoutOptions opts = {
+		.letterSpacing = 5.0f,
+		.horizontalAlign = drafttype::HorizontalAlign::Center
+	};
+
+	for (const auto &glyph : draft::layout(font, "Hello World!", opts)) {
 		// draw glyph
 	}
 ```
 
 ## Build and run example:
+
 ### Building with CMake
+
 Run the following commands to build the library + example:
-```
+
+```bash
 mkdir build
 cd build
-cmake ..
+cmake .. -DDRAFTTYPE_BUILD_EXAMPLE=1
 ```
+
 Building with Make:
-```
+
+```bash
 make -j
 ```
 
 ### Running the example
+
 Linux:
-```
+
+```bash
 cd build
 ./draft_type_example
 ```
@@ -63,20 +81,23 @@ cd build
 The example will generate a .ppm image dispaying all characters of the specified font (default: futural.jhf)
 
 ### Showcase:
-![image](assets/images/futural.png)
-*futural.ppm*
 
-![image](assets/images/timesr.png)
-*timesr.ppm*
+![image](assets/images/futural.png)<br/>
+_futural.ppm_
 
-![image](assets/images/astrology.png)
-*astrology.ppm*
+![image](assets/images/timesr.png)<br/>
+_timesr.ppm_
 
-![image](assets/images/gothgrt.png)
-*gothgrt.ppm*
+![image](assets/images/astrology.png)<br/>
+_astrology.ppm_
+
+![image](assets/images/gothgrt.png)<br/>
+_gothgrt.ppm_
 
 ### Font License:
+
 Applies to the fonts in: `assets/hershey-fonts/`
+
 ```
 USE RESTRICTION:
         This distribution of the Hershey Fonts may be used by anyone for

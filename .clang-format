@@ -3,14 +3,16 @@ UseTab: Always
 IndentWidth: 4
 TabWidth: 4
 ColumnLimit: 0
+PointerAlignment: Left
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterNamespace: true
   AfterClass: true
   AfterStruct: true
-  AfterFunction: false
+  AfterFunction: true
   AfterControlStatement: false
 
 NamespaceIndentation: All
 IndentAccessModifiers: false
 AccessModifierOffset: -4
+AlignAfterOpenBracket: BlockIndent

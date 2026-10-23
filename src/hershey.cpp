@@ -5,7 +5,8 @@
 
 namespace drafttype
 {
-	void HersheyFont::load(const std::string &path) {
+	void HersheyFont::load(const std::string& path)
+	{
 		std::ifstream file(path);
 
 		std::string line;
@@ -13,9 +14,6 @@ namespace drafttype
 		if (file.is_open()) {
 			m_size = 32;
 			while (std::getline(file, line)) {
-#if DEBUG
-				printf("parsing '%c'\n", (char)m_size);
-#endif
 				Glyph glyph = parse(line);
 				m_glyphs[m_size++] = glyph;
 				m_maxCharHeight = std::max(m_maxCharHeight, glyph.height);
@@ -27,20 +25,20 @@ namespace drafttype
 	}
 
 	// Generates font buffers for GPU rendering
-	GPUFont HersheyFont::generateGPUFont() const {
-		GPUFont gpuBuffers {};
+	GPUFont HersheyFont::generateGPUFont() const
+	{
+		GPUFont gpuBuffers{};
 
 		uint32_t vertexOffset = 0;
 		uint32_t indexOffset = 0;
-		for (const Glyph& glyph : m_glyphs)
-		{
+		for (const Glyph& glyph : m_glyphs) {
 			// append vertices
 			gpuBuffers.vertices.insert(gpuBuffers.vertices.end(), glyph.points.begin(), glyph.points.end());
 
 			uint32_t glyphIndexOffset = indexOffset;
 
 			// create index buffer for Line List topology
-			for(const Path& path : glyph.paths) {
+			for (const Path& path : glyph.paths) {
 				if (path.size <= 0) {
 					continue;
 				}
@@ -53,9 +51,9 @@ namespace drafttype
 
 			// TODO: create index buffer for Line List w\ Adjacency topology
 			gpuBuffers.glyphs.push_back(
-				GlyphInfo {
-					glyphIndexOffset,										// indexOffset
-					static_cast<uint32_t>(indexOffset - glyphIndexOffset)	// indexCount
+				GlyphInfo{
+					glyphIndexOffset,									  // indexOffset
+					static_cast<uint32_t>(indexOffset - glyphIndexOffset) // indexCount
 				}
 			);
 
@@ -65,15 +63,11 @@ namespace drafttype
 		return gpuBuffers;
 	}
 
-	HersheyFont::Glyph HersheyFont::parse(const std::string &line) const {
+	HersheyFont::Glyph HersheyFont::parse(const std::string& line) const
+	{
 		u_int16_t numVerts = std::stoi(line.substr(5, 3));
 		int16_t left = coord(line[8]);
 		int16_t right = coord(line[9]);
-		// u_int16_t id = std::stoi(line.substr(0, 5));
-#if DEBUG
-		printf("parsing glyph [%i], advance: %i verts: %i --- '%s'\n", id,
-			   right - left, numVerts, line.c_str());
-#endif
 
 		if (left > right) {
 			throw std::runtime_error("Invalid left position " + std::to_string(left) + " > right pos " + std::to_string(right) + "!");
@@ -108,12 +102,12 @@ namespace drafttype
 			verts.push_back(Vert{x, y});
 		}
 
-		paths.push_back(Path {
+		paths.push_back(Path{
 			j,										// offset
 			static_cast<uint16_t>(verts.size() - j) // size
 		});
 
-		return Glyph {
+		return Glyph{
 			static_cast<uint16_t>(right - left), // advance
 			static_cast<uint16_t>(top - bottom), // height
 			bottom,								 // ymin

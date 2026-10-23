@@ -5,6 +5,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "" FORCE)
 endif()
 
+option(DRAFTTYPE_BUILD_EXAMPLE "Build DraftType example" OFF)
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 set (CMAKE_CXX_STANDARD 11)
@@ -47,7 +49,9 @@ target_include_directories(draft_type
         ${SOURCE_DIR}
 )
 
-# Example executable
-include_directories(${INCLUDE_DIR})
-add_executable(draft_type_example ${SRC_EXAMPLE})
-target_link_libraries(draft_type_example PRIVATE draft_type)
+if(DRAFTTYPE_BUILD_EXAMPLE)
+  # Example executable
+  include_directories(${INCLUDE_DIR})
+  add_executable(draft_type_example ${SRC_EXAMPLE})
+  target_link_libraries(draft_type_example PRIVATE draft_type)
+endif(DRAFTTYPE_BUILD_EXAMPLE)

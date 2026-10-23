@@ -38,15 +38,15 @@ namespace drafttype
 		LineSpacingMode lineSpaceMode = LineSpacingMode::Fixed;
 
 		HorizontalAlign horizontalAlign = HorizontalAlign::Left;
-		VerticalAlign verticalAlign = VerticalAlign::Bottom;
+		VerticalAlign verticalAlign = VerticalAlign::Top;
 	};
 
 	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
-									float xoffset = 0.0f, float yoffset = 0.0f,
+									float x, float y,
+									const LayoutOptions &opts = {}, bool sort = false);
+
+	std::vector<ShapedGlyph> layout(const HersheyFont &font, const std::string &text,
 									const LayoutOptions &opts = {}, bool sort = false);
 
 	Bounds measure(const HersheyFont &font, const std::string &text, const LayoutOptions &opts = {});
-
-	// static void calculateLineDims(const HersheyFont &font, const std::string &text, int index, float &width, float &height, const LayoutOptions &opts);
-	// };
 } // namespace drafttype
